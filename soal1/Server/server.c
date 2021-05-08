@@ -36,12 +36,12 @@ void *client(void *arg)
         valread = read(socketfd, command, 1024);
         // printf("%s-%ld",command,strlen(command));
         if(strcmp(command,"register")==0)
-        {
-            // printf("Ini kalo dia regis\n");  
+        { 
             char buffers[1024];
             clear_buffer(buffers);
             valread = read(socketfd,buffers,1024);
             // printf("%s\n", buffers);
+            printf("Registrasi Sukses\n"); 
             fprintf(fdir,"%s\n",buffers);
             //pesan yang ditampilkan ke client
             send(socketfd,"Register Success",strlen("Register Success"),0);
@@ -57,7 +57,7 @@ void *client(void *arg)
             valread = read(socketfd,buffers,1024);
             while(fgets(temp, 1024, fdir) != NULL) 
             {
-//                 printf("%s",temp);
+                // printf("%s",temp);
                 if((strstr(temp, buffers)) != NULL) 
                 {
                     printf("Login Berhasil\n");
@@ -67,7 +67,7 @@ void *client(void *arg)
                     break;
                 }                
             }
-//             printf("bisa ga print");
+            // printf("bisa ga print");
             if(flag == 0)
             {
                 printf("Login Gagal\n");
