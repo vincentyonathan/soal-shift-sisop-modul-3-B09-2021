@@ -23,7 +23,7 @@ void clear_buffer(char* b)
 
 void pisah(char str[], char fileex[], char pemisah, int *idx)
 {
-    int index_ex;
+    int index_ex = 0;
     while(*idx < strlen(str) && str[*idx] != pemisah) {
         fileex[index_ex] = str[*idx];
         *idx += 1;
@@ -124,6 +124,7 @@ void *client(void *arg)
 
             send(socketfd, "success", strlen("success"), 0);
 
+            //fprintf(fdirc, "%s\n", buffers);
             fprintf(fdirc, "%s\n", data);
             
             fclose(fdirc);
