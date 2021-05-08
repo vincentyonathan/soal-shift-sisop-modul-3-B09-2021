@@ -21,6 +21,27 @@ void clear_buffer(char* b)
         b[i] = '\0';
 }
 
+void ekstrak(char buffers[], char filename[], char pub[], char tahun_pub[])
+{
+    int idx;
+    int len = strlen(buffers);
+
+    pisah(buffers, filename, ':', &index);
+    pisah(buffers, pub , ':', &index);
+    pisah(buffers, tahun_pub, ':', &index);
+}
+
+void  pisah(char str[], char fileex[], char pemisah, int *index)
+{
+    int index_ex;
+    while(*index < strlen(str) && str[*index] != pemisah) {
+        fileex[index_ex] = str[*index];
+        *index += 1;
+        index_ex++;    
+    }
+    fileex[index_ex] = '\0';
+    *index += 1;
+}
 
 
 void *client(void *arg)
@@ -93,11 +114,21 @@ void *client(void *arg)
             clear_buffer(buffers);
             valread = read(socketfd, buffers, 1024);
 
+            char filename[50];
+            char pub[50];
+            char tahun_pub[10];
+
+            ekstrak(buffers, filename, pub, tahun_pub);
+
+            char data[200];
+            sprintf(data, "%s\t%s\t%s", pub, tahun_pub);
+
             send(socketfd, "success", strlen("success"), 0);
 
-            fprintf(fdirc, "%s\n", buffers);
+            fprintf(fdirc, "%s\n", data);
             
             fclose(fdirc);
+
         }
         fclose(fdir);
     }
