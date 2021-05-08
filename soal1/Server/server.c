@@ -60,9 +60,9 @@ void *client(void *arg)
 //                 printf("%s",temp);
                 if((strstr(temp, buffers)) != NULL) 
                 {
+                    printf("Login Berhasil\n");
                     flag = 1;
                     char kata[20] = "Login Success";
-                    printf("Login Berhasil");
                     send(socketfd,kata, strlen(kata),0);
                     break;
                 }                
@@ -70,8 +70,8 @@ void *client(void *arg)
 //             printf("bisa ga print");
             if(flag == 0)
             {
+                printf("Login Gagal\n");
                 char kata[20] = "Login Failed";
-                printf("Login Gagal");
                 send(socketfd,kata, strlen(kata),0);
             }
         }
