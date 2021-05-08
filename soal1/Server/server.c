@@ -21,6 +21,8 @@ void clear_buffer(char* b)
         b[i] = '\0';
 }
 
+
+
 void *client(void *arg)
 {
     int socketfd = *(int *)arg;
@@ -74,6 +76,28 @@ void *client(void *arg)
                 char kata[20] = "Login Failed";
                 send(socketfd,kata, strlen(kata),0);
             }
+        }
+        else if(strcmp(command,"New Data")==0)
+        {
+            char buffers[1024];
+            printf("Adding to Database :\n");
+
+            send(socketfd, "success", strlen("success"), 0);
+            FILE *fdirc;
+            fdirc = fopen("file.tsv", "a+");
+            if (fdirc == NULL) 
+            {
+                perror("No File");
+                exit(EXIT_FAILURE);
+            }
+            clear_buffer(buffers);
+            valread = read(socketfd, buffers, 1024);
+
+            send(socketfd, "success", strlen("success"), 0);
+
+            fprintf(fdirc, "%s\n", buffers);
+            
+            fclose(fdirc);
         }
         fclose(fdir);
     }
