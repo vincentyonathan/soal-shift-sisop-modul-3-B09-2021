@@ -1,4 +1,4 @@
- #include <stdio.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -121,7 +121,7 @@ void *client(void *arg)
             ekstrak(buffers, filename, pub, tahun_pub);
 
             char data[200];
-            sprintf(data, "%s\t%s\t%s", pub, tahun_pub);
+            sprintf(data, "%s\t%s\t%s", filename, pub, tahun_pub);
 
             send(socketfd, "success", strlen("success"), 0);
 
