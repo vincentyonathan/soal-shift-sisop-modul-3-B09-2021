@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
     while(1)
     {
         char buffer[1024], command[1024];
-        printf("1. Login\n2. Register\n3. Exit\nCommand : ");
+        printf("1. Login\n2. Register\n3. Database\n4. Exit\nCommand : ");
         scanf("%s", command);
         if(strcmp(command,"login")==0)
         {
@@ -79,9 +79,49 @@ int main(int argc, char const *argv[]) {
             valread = read(new_socket , buffer, 1024);
             printf("%s\n", buffer);
         }
+        else if(strcmp(command,"add")==0)
+        {
+            printf("Ini masuk add");
+            char buffer[1024];
+            int valread;
+            char pub[20];
+            char tahun_pub[10];
+            char path_file[50];
+            char add_data[110];
+
+            send(new_socket, "New Data", strlen("New Data"), 0);
+
+
+            clear_buffer(buffer);
+            valread = read(new_socket, buffer, 1024);
+
+            printf("Publisher: ");
+            scanf("%s", pub);
+            printf("Tahun Publikasi: ");
+            scanf("%s", tahun_pub);
+            printf("Filepath: ");
+            scanf("%s", path_file);
+
+            sprintf(add_data, "%s:%s:%s", path_file, pub, tahun_pub);
+
+            send(new_socket, add_data, strlen(add_data), 0);
+            
+            clear_buffer(buffer);
+            valread = read(new_socket , buffer, 1024);
+
+            if (strcmp(buffer, "success") == 0) 
+            {
+                printf("Data added successfully\n");
+            } 
+            else 
+            {
+                printf("There's a problem adding data\n");
+            }
+
+        }
         else
         {
-            printf("Command Not Found.");
+            printf("Command Not Found.\n");
         }
     }   
     return 0;
