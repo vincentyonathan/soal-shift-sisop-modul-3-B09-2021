@@ -57,7 +57,7 @@ void *client(void *arg)
             valread = read(socketfd,buffers,1024);
             while(fgets(temp, 1024, fdir) != NULL) 
             {
-                printf("%s",temp);
+//                 printf("%s",temp);
                 if((strstr(temp, buffers)) != NULL) 
                 {
                     flag = 1;
@@ -67,7 +67,7 @@ void *client(void *arg)
                     break;
                 }                
             }
-            printf("bisa ga print");
+//             printf("bisa ga print");
             if(flag == 0)
             {
                 char kata[20] = "Login Failed";
