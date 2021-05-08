@@ -11,13 +11,29 @@
 void *factorial (void* arg)
 {
     int *data = (int *)arg;
+    int l=1;
 
     if (data[0]>=data[1]){
-        
+
     }
+    if (data[1]>data[0]){
+
+    }
+
+    if (data[0]==0){
+
+    }
+    if (data[1]==0){
+
+    }
+
+    int *o = (int*)malloc (sizeof(int));
+    *o = l;    
+    
+    pthread_exit(o);
 }
 
-int main()
+void main()
 {
     key_t key = 1234;
     int matrix[4][6]
@@ -48,7 +64,17 @@ int main()
             }
         }
 
+    printf ("Hasil dari faktorial matrix :\n");
+        for (int m=0; m<max;m++){
+            void *l;
+            pthread_join(thr[m], &l);
+            int *o = (int *)l;
+            printf("%d", *o)
+            if ((m+1)%c==0)printf("\n");
+            else printf(" "); 
+    }
+        sleep(5);
+        shmdt(value);
+        shmctl(shmid, IPC_RMID, NULL);
 
-
-    return 0;
 }
