@@ -35,7 +35,7 @@ void pisah(char str[], char fileex[], char pemisah, int *idx)
 
 void ekstrak(char buffers[], char filename[], char pub[], char tahun_pub[])
 {
-    int idx;
+    int idx = 0;
     int len = strlen(buffers);
 
     pisah(buffers, filename, ':', &idx);
