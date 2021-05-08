@@ -21,28 +21,27 @@ void clear_buffer(char* b)
         b[i] = '\0';
 }
 
+void pisah(char str[], char fileex[], char pemisah, int *idx)
+{
+    int index_ex;
+    while(*idx < strlen(str) && str[*idx] != pemisah) {
+        fileex[index_ex] = str[*idx];
+        *idx += 1;
+        index_ex++;    
+    }
+    fileex[index_ex] = '\0';
+    *idx += 1;
+}
+
 void ekstrak(char buffers[], char filename[], char pub[], char tahun_pub[])
 {
     int idx;
     int len = strlen(buffers);
 
-    pisah(buffers, filename, ':', &index);
-    pisah(buffers, pub , ':', &index);
-    pisah(buffers, tahun_pub, ':', &index);
+    pisah(buffers, filename, ':', &idx);
+    pisah(buffers, pub , ':', &idx);
+    pisah(buffers, tahun_pub, ':', &idx);
 }
-
-void  pisah(char str[], char fileex[], char pemisah, int *index)
-{
-    int index_ex;
-    while(*index < strlen(str) && str[*index] != pemisah) {
-        fileex[index_ex] = str[*index];
-        *index += 1;
-        index_ex++;    
-    }
-    fileex[index_ex] = '\0';
-    *index += 1;
-}
-
 
 void *client(void *arg)
 {
