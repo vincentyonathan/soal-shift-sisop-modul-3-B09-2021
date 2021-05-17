@@ -128,7 +128,7 @@ void *client(void *arg)
             fprintf(fdirc, "%s\n", data);
             
             fclose(fdirc);
-
+            //Test
         }
         fclose(fdir);
     }
