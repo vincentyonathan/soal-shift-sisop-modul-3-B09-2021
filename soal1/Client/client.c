@@ -42,7 +42,7 @@ int main(int argc, char const *argv[]) {
     while(1)
     {
         char buffer[1024], command[1024];
-        printf("1. Login\n2. Register\n3. Database\n4. Exit\nCommand : ");
+        printf("1. Login\n2. Register\n3. Database\n4. Download\n5. Delete\n6. See\n7. Find\n8. Exit\nCommand : ");
         scanf("%s", command);
         if(strcmp(command,"login")==0)
         {
@@ -81,7 +81,7 @@ int main(int argc, char const *argv[]) {
         }
         else if(strcmp(command,"add")==0)
         {
-            printf("Ini masuk add");
+            // printf("Ini masuk add");
             char buffer[1024];
             int valread;
             char pub[20];
@@ -90,7 +90,6 @@ int main(int argc, char const *argv[]) {
             char add_data[110];
 
             send(new_socket, "New Data", strlen("New Data"), 0);
-
 
             clear_buffer(buffer);
             valread = read(new_socket, buffer, 1024);
@@ -119,6 +118,85 @@ int main(int argc, char const *argv[]) {
             }
 
         }
+        else if(strcmp(command, "download")==0)
+        {
+            char buffer[1024];
+            int valread;
+            char filename[50];
+
+            scanf("%s", filename);
+            send(new_socket,"DownloadFile", strlen("DownloadFile"),0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket, buffer, 1024);
+            printf("buffer client --> %s\n", buffer);
+            send(new_socket, filename, strlen(filename),0);
+            
+        }
+        else if(strcmp(command,"see")==0)
+        {
+            char buffer[1024];
+            int valread;
+
+            send(new_socket, "See", strlen("See"), 0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket,buffer,1024);
+            printf("%s\n",buffer);
+        }
+        else if (strcmp(command,"delete")==0)
+        {
+            char buffer[1024];
+            int valread;
+            char namafile[50];
+
+            send(new_socket,"Delete", strlen("Delete"),0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket,buffer,1024);
+
+            scanf("%s",namafile);
+
+            send(new_socket,namafile,strlen(namafile),0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket,buffer,1024);
+            if (strcmp(buffer,"Success"))
+            {
+                printf("Data deleted successfuly.\n");
+            }
+            else
+            {
+                printf("There's a problem deleting data\n");
+            }
+        }
+        else if(strcmp(command,"find")==0)
+        {
+            char buffer[1024];
+            int valread;
+            char findfile[50];
+
+            send(new_socket,"Find", strlen("Find"),0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket,buffer,1024);
+
+            scanf("%s",findfile);
+
+            send(new_socket,findfile,strlen(findfile),0);
+
+            clear_buffer(buffer);
+            valread = read(new_socket,buffer,1024);
+            if(strlen(buffer) > 0)
+            {
+                printf("%s",buffer);
+            }
+            else
+            {
+                printf("%s",buffer);
+            }
+        }
+        
         else
         {
             printf("Command Not Found.\n");
