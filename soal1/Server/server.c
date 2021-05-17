@@ -43,6 +43,35 @@ void ekstrak(char buffers[], char filename[], char pub[], char tahun_pub[])
     pisah(buffers, tahun_pub, ':', &idx);
 }
 
+
+void upload(int sockets, char namafile[])
+{
+    char buffer[1024];
+    int valread;
+    ssize_t length;
+
+    send(sockets,"Upload", strlen("Upload"),0);
+    clear_buffer(buffer);
+    read(sockets,buffer,1024);
+    
+    FILE *filedir;
+    char file_path[100];
+    sprintf(file_path, "FILES/%s", namafile);
+
+    length = read(sockets, buffer, 1024);
+
+    filedir = fopen(file_path, "w");
+    if (filedir == NULL) 
+    {
+        perror("No File");
+        exit(EXIT_FAILURE);
+    }
+    // *prt, *size byte per kata, number of elements ,tujuan
+    fwrite(buffer, sizeof(char),length,filedir);
+
+    fclose(filedir);    
+}
+
 void *client(void *arg)
 {
     int socketfd = *(int *)arg;
@@ -115,21 +144,184 @@ void *client(void *arg)
 
             char filename[50];
             char pub[50];
-            char tahun_pub[10];
+            char tahun_pub[10];            
 
             ekstrak(buffers, filename, pub, tahun_pub);
 
             char data[200];
-            sprintf(data, "%s\t%s\t%s", filename, pub, tahun_pub);
+            sprintf(data, "FILE/%s\t%s\t%s", filename, pub, tahun_pub);
+
+            upload(socketfd,filename);
 
             send(socketfd, "success", strlen("success"), 0);
 
             //fprintf(fdirc, "%s\n", buffers);
             fprintf(fdirc, "%s\n", data);
+
+            FILE* flog;
+            flog = fopen("running.log","a+");
+
+            //fprintf(fp_log, "Tambah: %s (%s)\n", filename, user_auth);
+
+            fclose(fp_log);
             
             fclose(fdirc);
-            //Test
+
         }
+        else if (strcmp(command,"DownloadFile")==0)
+        {
+            char buffers[1024];
+            int exist;
+            char baris[50];
+            char iterationb[30];
+            printf("Download File\n");
+
+            send(socketfd, "Success Download", strlen("Success Download"),0);
+
+            clear_buffer(buffers);
+            valread = read(socketfd, buffers, 1024);
+            printf("buffer server --> %s\n", buffers);
+            
+            char file_path[100];
+            strcpy(file_path,buffers);
+
+            FILE *fdi;
+            fdi = fopen("FILE/file.tsv","r");
+            while (fgets(baris, sizeof(baris), fdi)) 
+            {
+                int index = 0;
+                pisah(baris, iterationb, '\t', &index);
+                if (strcmp(iterationb, file_path) == 0)
+                {
+                    exist = 1;
+                    break;
+                }
+            }
+            fclose(fdi);
+            if (exist)
+            {
+                // printf("Ada ni filenya\n");
+                send(socketfd, "Down Success", strlen("Down Success"),0 );
+
+            }
+            else 
+                // printf("File not found.\n");
+                send(socketfd, "Down Failed", strlen("Failed"),0);
+        }
+        else if (strcmp(command,"See")==0)
+        {
+            printf("See Files:\n");
+            int valread;
+            char buffers[1024];
+            char files[300];
+            char data[1024];
+
+            FILE *fi;
+            fi = fopen("file.tsv","r");
+
+            while (fgets(files, sizeof files, fi)) 
+            {
+                printf("Masuk While\n");
+                int idx = 0;
+                char publ[50];
+                char nama[20];
+                char file_ext[10];
+                char tahun_pub[10];
+                char file_path[100];
+                char header_path[50];
+
+                pisah(files, header_path, '/', &idx);
+                pisah(files, nama, '.', &idx);
+                pisah(files, file_ext, '\t', &idx);
+
+                // printf("Ini header_path %s\n", header_path);
+                // printf("Ini file_ext %s\n", file_ext);
+                // printf("Ini nama %s\n", nama);
+                sprintf(file_path, "%s/%s.%s", header_path, nama, file_ext);
+                
+                pisah(files, publ, '\t', &idx);
+                pisah(files, tahun_pub, '\n', &idx);
+                // printf("Ini publ %s\n", publ);
+                // printf("Ini tahun_pub %s\n", tahun_pub);
+                sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
+
+                strcat(buffers, data);
+                send(socketfd, data, strlen(data),0 );       
+                        
+            }
+            send(socketfd, data, strlen(data), 0);
+
+            fclose(fi);
+        }
+        else if(strcmp(command,"Delete")==0)
+        {
+            char buffers[1024];
+            int valread;
+
+            send(socketfd,"Success",strlen("Success"),0);
+
+            clear_buffer(buffers);
+            valread = read(socketfd,buffers,1024);
+
+        }
+        else if (strcmp(command,"Find")==0)
+        {
+            char buffers[1024];
+            int valread;
+            char files[300];
+            char data[1024];
+
+            send(socketfd,"Success",strlen("Success"),0);
+
+            clear_buffer(buffers);
+            valread = read(socketfd,buffers,1024);
+
+            char filename[50];
+            strcpy(filename,buffers);
+
+            FILE* ffile;
+            ffile = fopen("file.tsv","r");
+
+            while (fgets(files, sizeof files, ffile)!= NULL) 
+            {
+                char file_exist[50];
+                char delim = '\t';
+                int idxs = 0;
+                char fordata[1024];
+                pisah(files, file_exist, delim, &idxs);
+                if (strstr(file_exist, filename))
+                {   
+                    int idx = 0;
+                    char publ[50];
+                    char nama[20];
+                    char file_ext[10];
+                    char tahun_pub[10];
+                    char file_path[100];
+                    char header_path[50];
+
+                    pisah(files, header_path, '/', &idx);
+                    pisah(files, nama, '.', &idx);
+                    pisah(files, file_ext, '\t', &idx);
+
+                    // printf("Ini header_path %s\n", header_path);
+                    // printf("Ini file_ext %s\n", file_ext);
+                    // printf("Ini nama %s\n", nama);
+                    sprintf(file_path, "%s/%s.%s", header_path, nama, file_ext);
+                    
+                    pisah(files, publ, '\t', &idx);
+                    pisah(files, tahun_pub, '\n', &idx);
+                    // printf("Ini publ %s\n", publ);
+                    // printf("Ini tahun_pub %s\n", tahun_pub);
+                    sprintf(fordata, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
+
+                    strcat(buffers, fordata);
+                }
+            send(socketfd, fordata, strlen(fordata),0 );
+            }
+            // send(socketfd, fordata, strlen(fordata),0 );
+            fclose(ffile);
+        }
+        
         fclose(fdir);
     }
 }
