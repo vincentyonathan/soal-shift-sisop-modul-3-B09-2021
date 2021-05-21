@@ -17,7 +17,7 @@ pthread_t tid[1000];
 void clear_buffer(char* b) 
 {
     int i;
-    for (i = 0; i < 1024; i++)
+    for (i = 0; i < BUFSIZ; i++)
         b[i] = '\0';
 }
 
@@ -46,37 +46,73 @@ void ekstrak(char buffers[], char filename[], char pub[], char tahun_pub[])
 
 void upload(int sockets, char namafile[])
 {
-    char buffer[1024];
+    printf("Upload Proses");
+    char buffer[BUFSIZ];
     int valread;
     ssize_t length;
 
     send(sockets,"Upload", strlen("Upload"),0);
     clear_buffer(buffer);
-    read(sockets,buffer,1024);
-    
+    read(sockets,buffer,BUFSIZ);
+    printf("ini buffer upload --> %s\n",buffer);
+
+    // printf("SEND UPLOADIN\n");
+    // send(sockets,"upload in", strlen("upload in"),0);
+    // printf("SELESAI SEND UPLOADIN\n");
+
     FILE *filedir;
     char file_path[100];
     sprintf(file_path, "FILES/%s", namafile);
 
-    length = read(sockets, buffer, 1024);
+    // length = recv(sockets,buffer,BUFSIZ,0);
 
+    // send(sockets,"upload start", strlen("upload start"),0);
     filedir = fopen(file_path, "w");
-    if (filedir == NULL) 
-    {
-        perror("No File");
-        exit(EXIT_FAILURE);
-    }
-    // *prt, *size byte per kata, number of elements ,tujuan
-    fwrite(buffer, sizeof(char),length,filedir);
 
+    
+    clear_buffer(buffer);
+    read(sockets, buffer, BUFSIZ);
+    fprintf(filedir, "%s", buffer);
+
+    
     fclose(filedir);    
+}
+
+void delete_tsv(char name[], int linecount)
+{
+    FILE *fp, *fp_temp;
+    char str[BUFSIZ];
+    char file_name_temp[] = "temp_file.txt";
+    int counter = 0;
+    char ch;
+
+    fp = fopen(name, "r");
+    fp_temp = fopen(file_name_temp, "w"); 
+
+    while (!feof(fp)) 
+    {
+        strcpy(str, "\0");
+        fgets(str, BUFSIZ, fp);
+        if (!feof(fp)) 
+        {
+            counter++;
+            if (counter != linecount) 
+            {
+                fprintf(fp_temp, "%s", str);
+            }
+        }
+    }
+    fclose(fp);
+    fclose(fp_temp);
+    remove(name);
+    rename(file_name_temp, name);
 }
 
 void *client(void *arg)
 {
     int socketfd = *(int *)arg;
     int valread;
-    char command[1024];
+    char command[BUFSIZ];
 
     while(1)
     {    
@@ -84,13 +120,13 @@ void *client(void *arg)
         FILE *fdir;
         fdir = fopen("akun.txt","a+");    
         clear_buffer(command);
-        valread = read(socketfd, command, 1024);
+        valread = read(socketfd, command, BUFSIZ);
         // printf("%s-%ld",command,strlen(command));
         if(strcmp(command,"register")==0)
         { 
-            char buffers[1024];
+            char buffers[BUFSIZ];
             clear_buffer(buffers);
-            valread = read(socketfd,buffers,1024);
+            valread = read(socketfd,buffers,BUFSIZ);
             // printf("%s\n", buffers);
             printf("Registrasi Sukses\n"); 
             fprintf(fdir,"%s\n",buffers);
@@ -99,14 +135,14 @@ void *client(void *arg)
         }
         else if (strcmp(command,"login")==0)
         {
-            char temp[1024];
+            char temp[BUFSIZ];
             char userada[10];
             // printf("Ini kalo dia login\n");  
-            char buffers[1024];
+            char buffers[BUFSIZ];
             int flag = 0;
             clear_buffer(buffers);
-            valread = read(socketfd,buffers,1024);
-            while(fgets(temp, 1024, fdir) != NULL) 
+            valread = read(socketfd,buffers,BUFSIZ);
+            while(fgets(temp, BUFSIZ, fdir) != NULL) 
             {
                 // printf("%s",temp);
                 if((strstr(temp, buffers)) != NULL) 
@@ -128,7 +164,7 @@ void *client(void *arg)
         }
         else if(strcmp(command,"New Data")==0)
         {
-            char buffers[1024];
+            char buffers[BUFSIZ];
             printf("Adding to Database :\n");
 
             send(socketfd, "success", strlen("success"), 0);
@@ -140,7 +176,7 @@ void *client(void *arg)
                 exit(EXIT_FAILURE);
             }
             clear_buffer(buffers);
-            valread = read(socketfd, buffers, 1024);
+            valread = read(socketfd, buffers, BUFSIZ);
 
             char filename[50];
             char pub[50];
@@ -149,48 +185,52 @@ void *client(void *arg)
             ekstrak(buffers, filename, pub, tahun_pub);
 
             char data[200];
-            sprintf(data, "FILE/%s\t%s\t%s", filename, pub, tahun_pub);
+            sprintf(data, "FILES/%s\t%s\t%s", filename, pub, tahun_pub);
 
             upload(socketfd,filename);
 
+            printf("buffer co --> %s\n",buffers);
             send(socketfd, "success", strlen("success"), 0);
 
             //fprintf(fdirc, "%s\n", buffers);
             fprintf(fdirc, "%s\n", data);
 
-            FILE* flog;
-            flog = fopen("running.log","a+");
+            // FILE* flog;
+            // flog = fopen("running.log","a+");
 
             //fprintf(fp_log, "Tambah: %s (%s)\n", filename, user_auth);
 
-            fclose(fp_log);
+            //fclose(flog);
             
             fclose(fdirc);
 
         }
         else if (strcmp(command,"DownloadFile")==0)
         {
-            char buffers[1024];
+            char buffers[BUFSIZ];
             int exist;
             char baris[50];
             char iterationb[30];
+            //untuk saat found
+            char datat[BUFSIZ];
             printf("Download File\n");
 
             send(socketfd, "Success Download", strlen("Success Download"),0);
 
             clear_buffer(buffers);
-            valread = read(socketfd, buffers, 1024);
+            valread = read(socketfd, buffers, BUFSIZ);
             printf("buffer server --> %s\n", buffers);
             
-            char file_path[100];
-            strcpy(file_path,buffers);
+            char file_path[100] = "FILES/";
+            strcat(file_path,buffers);
 
             FILE *fdi;
-            fdi = fopen("FILE/file.tsv","r");
+            fdi = fopen("file.tsv","r");
             while (fgets(baris, sizeof(baris), fdi)) 
             {
                 int index = 0;
                 pisah(baris, iterationb, '\t', &index);
+                printf("%s -- %s\n", iterationb, file_path);
                 if (strcmp(iterationb, file_path) == 0)
                 {
                     exist = 1;
@@ -200,25 +240,37 @@ void *client(void *arg)
             fclose(fdi);
             if (exist)
             {
-                // printf("Ada ni filenya\n");
                 send(socketfd, "Down Success", strlen("Down Success"),0 );
-
+                // printf("buffer ketemu --> %s\n",buffers);
+                // printf("Ada ni filenya\n");
+                clear_buffer(buffers);
+                read(socketfd,buffers,BUFSIZ);
+                fdi = fopen(file_path,"rb");
+                while(fgets(datat, BUFSIZ, fdi) != NULL) 
+                {
+                    send(socketfd, datat, strlen(datat), 0);
+                    bzero(datat,BUFSIZ);
+                }
+                fclose(fdi);
+                bzero(buffers,BUFSIZ);
             }
-            else 
-                // printf("File not found.\n");
-                send(socketfd, "Down Failed", strlen("Failed"),0);
+            else
+            {
+                send(socketfd, "Down Failed", strlen("Down Failed"),0);
+            } 
         }
         else if (strcmp(command,"See")==0)
         {
-            printf("See Files:\n");
             int valread;
-            char buffers[1024];
+            char buffers[BUFSIZ];
             char files[300];
-            char data[1024];
+            char data[BUFSIZ];
+            char datafix[BUFSIZ];
 
             FILE *fi;
             fi = fopen("file.tsv","r");
 
+            clear_buffer(datafix);
             while (fgets(files, sizeof files, fi)) 
             {
                 printf("Masuk While\n");
@@ -243,38 +295,85 @@ void *client(void *arg)
                 pisah(files, tahun_pub, '\n', &idx);
                 // printf("Ini publ %s\n", publ);
                 // printf("Ini tahun_pub %s\n", tahun_pub);
-                sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
+                sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
 
-                strcat(buffers, data);
-                send(socketfd, data, strlen(data),0 );       
-                        
+                //printf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
+                strcat(datafix, data);   
+                printf("strcat buffer di while %s\n",data);     
             }
-            send(socketfd, data, strlen(data), 0);
-
+            printf("strcat buffer data %s\n",datafix);  
+            send(socketfd,datafix,strlen(datafix),0);
             fclose(fi);
         }
         else if(strcmp(command,"Delete")==0)
         {
-            char buffers[1024];
+            char temp[] = "file.tsv";
+            char namatemp[] = "FILES/";
+            char buffers[BUFSIZ];
             int valread;
+            char iterasi[30];
+            char baris[50];
+            char namafile[50];
+            int exist;
+            int line;
 
             send(socketfd,"Success",strlen("Success"),0);
 
+            //untuk nerima nama file
             clear_buffer(buffers);
-            valread = read(socketfd,buffers,1024);
+            valread = read(socketfd,buffers,BUFSIZ);
+
+            strcpy(namafile,buffers);
+            strcat(namatemp,namafile);
+
+            FILE *fdel;
+            fdel = fopen("file.tsv","r");
+            while (fgets(baris, sizeof(baris), fdel)) 
+            {
+                line++;
+                int index = 0;
+                pisah(baris, iterasi, '\t', &index);
+                printf("%s -- %s\n", iterasi, namatemp);
+                if (strcmp(iterasi, namatemp) == 0)
+                {
+                    exist = 1;
+                    break;
+                }
+            }
+            fclose(fdel);
+            if(exist)
+            {
+                char path_file[100];
+                sprintf(path_file,"FILES/%s",namafile);
+
+                char new_name[100];
+                sprintf(new_name,"FILES/old-%s",namafile);
+
+                delete_tsv(temp,line);
+
+                rename(path_file, new_name);
+
+                send(socketfd,"Success", strlen("Success"),0);
+            }
+            else
+            {
+                send(socketfd,"Failed", strlen("Failed"),0);
+            }
 
         }
         else if (strcmp(command,"Find")==0)
         {
-            char buffers[1024];
+            char buffers[BUFSIZ];
             int valread;
             char files[300];
-            char data[1024];
+            char data[BUFSIZ];
+            char fordata[BUFSIZ];
+            int flag = 0;
 
             send(socketfd,"Success",strlen("Success"),0);
 
             clear_buffer(buffers);
-            valread = read(socketfd,buffers,1024);
+            valread = read(socketfd,buffers,BUFSIZ);
 
             char filename[50];
             strcpy(filename,buffers);
@@ -287,7 +386,7 @@ void *client(void *arg)
                 char file_exist[50];
                 char delim = '\t';
                 int idxs = 0;
-                char fordata[1024];
+                // char fordata[BUFSIZ];
                 pisah(files, file_exist, delim, &idxs);
                 if (strstr(file_exist, filename))
                 {   
@@ -315,10 +414,18 @@ void *client(void *arg)
                     sprintf(fordata, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
 
                     strcat(buffers, fordata);
+                    // printf("Ini buffers dan fordata --> %s\n", buffers);
                 }
-            send(socketfd, fordata, strlen(fordata),0 );
             }
-            // send(socketfd, fordata, strlen(fordata),0 );
+            if(flag == 1)
+            {
+                send(socketfd, fordata, strlen(fordata),0 );
+            }
+            else
+            {
+                send(socketfd,"Failed", strlen("Failed"),0);
+            }
+            
             fclose(ffile);
         }
         
@@ -332,7 +439,7 @@ int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[1024] = {0};
+    char buffer[BUFSIZ] = {0};
     char *hello = "Hello from server";
       
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
