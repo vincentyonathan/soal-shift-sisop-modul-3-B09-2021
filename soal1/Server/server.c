@@ -397,6 +397,8 @@ void *client(void *arg)
                     char tahun_pub[10];
                     char file_path[100];
                     char header_path[50];
+                    
+                    flag = 1;
 
                     pisah(files, header_path, '/', &idx);
                     pisah(files, nama, '.', &idx);
