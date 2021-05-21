@@ -1,80 +1,70 @@
 #include <stdio.h>
-#include <string.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <stdlib.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>
-#include <stdlib.h>
+#include <pthread.h>
+#include <stdbool.h>
 
-void *factorial (void* arg)
-{
-    int *data = (int *)arg;
-    int l=1;
+int mx2[4][6], selisih;
+bool isnull = false;
 
-    if (data[0]>=data[1]){
-
-    }
-    if (data[1]>data[0]){
-
-    }
-
-    if (data[0]==0){
-
-    }
-    if (data[1]==0){
-
-    }
-
-    int *o = (int*)malloc (sizeof(int));
-    *o = l;    
-    
-    pthread_exit(o);
+void input(){
+	printf("Input matriks 4x6\n");
+	for (int i = 0; i < 4; i++) {
+    	for (int j = 0; j < 6; j++) {
+      		scanf("%d", &mx2[i][j]);
+   	 	}
+  	}
+}
+long long factorial(int n) {
+    if (n == 0) return 1;
+    else return n * factorial(n - 1);
+}
+long long except(int n){
+	if (n == selisih) return 1;
+        else return n * except(n - 1);
 }
 
-void main()
-{
-    key_t key = 1234;
-    int matrix[4][6]
-    int (*value)[4][6];
-    int c=4;
-    int d=6;
+void *kondisi(void* arg){
+	long long angka = *(long long*)arg;
+	if(isnull)//=0
+		printf("0 ");
+	else if(selisih<1) /// <1
+    	printf("%lld ", factorial(angka));
+	else//>1
+		printf("%lld ", except(angka));
+}
 
-    int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
-        value = shmat(shmid, NULL, 0);
-
-    int m, n;
-    printf("Masukkan elemen matrix baru :\n");
-    for (m=0; m<4; m++) {
-        for (n=0; n<6; n++) {
-            scanf("%d", &matrixBaru[m][n]);
-            }
+int main(){
+	int angka;
+	key_t key = 1234;
+    int (*value)[6];
+    int shmid = shmget(key, sizeof(int[4][6]), IPC_CREAT | 0666);
+    value = shmat(shmid, NULL, 0);
+    
+    input();
+    
+    pthread_t tid[4*6];
+    int index=0;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 6; j++){
+        	isnull=false;
+            long long *val = malloc(sizeof(long long[4][6]));
+            *val = value[i][j];
+            selisih = value[i][j] - mx2[i][j];
+            if(value[i][j]==0 || mx2[i][j]==0) isnull=true;
+            pthread_create(&tid[index], NULL, &kondisi, val);
+            sleep(1);
+            index++;
         }
-    int sum = c * d;
-    pthread_t *thr;
-    thr = (pthread_t*)malloc(max * sizeof(pthread_t));
-
-    for (int m=0; m<c; m++) {
-            for (int n=0; n<d; n++) {
-                data = (int *)malloc((max)*sizeof(int));
-                data[0] = (*value)[c][d];
-                data[1] = matrixBaru[c][d];
-                pthread_create(&threads[count++], NULL, factorial, (void*)(data));
-            }
-        }
-
-    printf ("Hasil dari faktorial matrix :\n");
-        for (int m=0; m<max;m++){
-            void *l;
-            pthread_join(thr[m], &l);
-            int *o = (int *)l;
-            printf("%d", *o)
-            if ((m+1)%c==0)printf("\n");
-            else printf(" "); 
+        printf("\n");
     }
-        sleep(5);
-        shmdt(value);
-        shmctl(shmid, IPC_RMID, NULL);
+    for (int i = 0; i < index; i++) {
+        pthread_join(tid[i], NULL);
+    }
+    shmdt(value);
+    shmctl(shmid, IPC_RMID, NULL);
 
+	return 0;
 }
