@@ -6,7 +6,7 @@
 * Pramudityo Prabowo  - 05111940000210
 ---
 ### Soal Modul 3
-[Soal Shift Modul 3](docs.google.com/document/d/1ud1JyncoSDAo5hA03wPvjn7QBHPUeUG1eBJ8ETtq2dQ/edit)
+[Soal Shift Modul 3](https://docs.google.com/document/d/1ud1JyncoSDAo5hA03wPvjn7QBHPUeUG1eBJ8ETtq2dQ/edit)
 
 ---
 
