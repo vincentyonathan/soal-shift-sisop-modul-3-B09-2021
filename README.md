@@ -551,19 +551,83 @@ else if(strcmp(command,"Delete")==0)
 
 ---
 #### 1. f)
-*Praktikan* diminta untuk membuat fitur `Delete` dimana client dapat menghapus file yang tersimpan di server. Namun tidak dihapus, hanya diganti nama menjadi ‘old-NamaFile.ekstensi’. Kemudian ketika file telah diubah namanya, maka row dari file tersebut di file.tsv akan terhapus.
+*Praktikan* diminta untuk membuat fitur `See` dimana client dapat melihat semua isi files.tsv. Output dari perintah tersebut keluar dengan format yang tertera pada soal.
 
 #### Source Code
 ---
 #### Client :
 ```c
+...
+ else if(strcmp(command2,"see")==0)
+    {
+	char buffer[BUFSIZ];
+	int valread;
 
+	send(new_socket, "See", strlen("See"), 0);
+
+	clear_buffer(buffer);
+	valread = read(new_socket,buffer,BUFSIZ);
+	printf("%s\n",buffer);
+    }
+...
 ```
 #### Server :
 ```c
+ else if (strcmp(command,"See")==0)
+        {
+            int valread;
+            char buffers[BUFSIZ];
+            char files[300];
+            char data[BUFSIZ];
+            char datafix[BUFSIZ];
+
+            FILE *fi;
+            fi = fopen("file.tsv","r");
+
+            clear_buffer(datafix);
+            while (fgets(files, sizeof files, fi)) 
+            {
+                printf("Masuk While\n");
+                int idx = 0;
+                char publ[50];
+                char nama[20];
+                char file_ext[10];
+                char tahun_pub[10];
+                char file_path[100];
+                char header_path[50];
+
+                pisah(files, header_path, '/', &idx);
+                pisah(files, nama, '.', &idx);
+                pisah(files, file_ext, '\t', &idx);
+
+                // printf("Ini header_path %s\n", header_path);
+                // printf("Ini file_ext %s\n", file_ext);
+                // printf("Ini nama %s\n", nama);
+                sprintf(file_path, "%s/%s.%s", header_path, nama, file_ext);
+                
+                pisah(files, publ, '\t', &idx);
+                pisah(files, tahun_pub, '\n', &idx);
+                // printf("Ini publ %s\n", publ);
+                // printf("Ini tahun_pub %s\n", tahun_pub);
+                sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
+
+                //printf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
+                strcat(datafix, data);   
+                printf("strcat buffer di while %s\n",data);     
+            }
+            printf("strcat buffer data %s\n",datafix);  
+            send(socketfd,datafix,strlen(datafix),0);
+            fclose(fi);
+        }
 ```
 #### Explanation :
-
+- Untuk melakukan delete, user harus mengetikkan command "delete" diikuti dengan namafile.exstensi
+- Client akan mengirimkan perintah "Delete" kepada Server yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
+- Kemudian Server akan membuka file.tsv dan mengiterasi satu persatu barisnya.
+- Iterasi tersebut sekaligus memanggil fungsi yang akan memisahkan data (publisher, tahun publish, dll) dan menyimpannya dalam variable.
+- Kemudian, server akan menggunakan `sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);` untuk melakukan print data yang telah di pisah dan ekstrak.
+- Karena ide saya adalah hanya `send` 1x, maka Server melakukan `strcat` untuk data yang akan dikirm sehingga nantinya data yang akan dikirim berisi semua data yang telah difilter.
+- Lalu terakhir, server akan melakukan `send` data final tersebut dan akan diterima oleh Client untuk ditampilkan.
 ---
 #### 1. g)
 *Praktikan* diminta untuk membuat fitur `Add` dimana client dapat menambah file baru ke dalam server dalam FILES dengan struktur (`namafile.exstensi`)
