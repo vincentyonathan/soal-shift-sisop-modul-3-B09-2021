@@ -17,6 +17,22 @@ void clear_buffer(char* b)
         b[i] = '\0';
 }
 
+void connect_to_server(int socketfd) 
+{
+    char buffer[BUFSIZ];
+    int valread;
+    
+    send(socketfd, "satu", strlen("satu"), 0);
+
+    fprintf(stdout, "Menunggu koneksi dari server...\n");
+    
+    clear_buffer(buffer);
+    valread = read(socketfd , buffer, BUFSIZ);
+    fprintf(stdout, "Terhubung dengan server\n");
+
+    send(socketfd, "Sukses lagi",strlen("Sukses lagi"),0);
+}
+
 int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
     int new_socket = 0, valread;
@@ -42,10 +58,11 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
+    connect_to_server(new_socket);
     while(1)
     {
         char buffer[BUFSIZ], command[BUFSIZ];
-        printf("1. Login\n2. Register\nCommand :\n");
+        printf("1. Login\n2. Register\n3. Logout\nCommand :\n");
         scanf("%s", command);
         if(strcmp(command,"login")==0)
         {
@@ -68,7 +85,7 @@ int main(int argc, char const *argv[]) {
             {
                 while(1)
                 {
-                    printf("\n1. Add Database\n2. Download\n3. Delete\n4. See\n5. Find\n6. Logout\nCommand : ");
+                    printf("\n1. Add Database\n2. Download\n3. Delete\n4. See\n5. Find\n6.Exit\nCommand : ");
                     char command2[20];
                     scanf("%s", command2);
                     if(strcmp(command2,"add")==0)
@@ -121,10 +138,6 @@ int main(int argc, char const *argv[]) {
                         if (strcmp(buffer, "success") == 0) 
                         {
                             printf("Data added successfully\n");
-
-                            FILE* log = fopen("running.log", "a") ;
-                            fprintf(log, "Tambah : %s (%s)\n", path_file, username);
-                            fclose(log) ;
                         } 
                         else 
                         {
@@ -203,10 +216,6 @@ int main(int argc, char const *argv[]) {
                         if (strcmp(buffer,"Success")==0)
                         {
                             printf("Data deleted successfuly.\n");
-
-                            FILE* dlog = fopen("running.log", "a") ;
-                            fprintf(dlog, "Hapus : %s (%s)\n", namafile, username);
-                            fclose(dlog);
                         }
                         else
                         {
@@ -241,7 +250,7 @@ int main(int argc, char const *argv[]) {
                             printf("%s\n",buffer);
                         }
                     }
-                    else if(strcmp(command2,"logout")==0)
+                    else if(strcmp(command2,"exit")==0)
                     {
                         break;
                     }
@@ -264,6 +273,10 @@ int main(int argc, char const *argv[]) {
             clear_buffer(buffer);
             valread = read(new_socket , buffer, BUFSIZ);
             printf("%s\n", buffer);
+        }
+        else if(strcmp(command,"logout")==0)
+        {
+            break;
         }
     }   
     return 0;
