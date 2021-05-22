@@ -174,3 +174,5 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Karena diminta aga server dapat menghandle banyak connections. Maka dibuat thread untuk menghandle setiap koneksi. 
 - Untuk itu, Digunakan fungsi pthread_join untuk menunggu thread sampai selesai baru membuat thread baru lagi untuk membuat koneksi dengan client baru.
 
+#### 1.b)
+*Praktikan* diminta untuk membuat fitur add data
