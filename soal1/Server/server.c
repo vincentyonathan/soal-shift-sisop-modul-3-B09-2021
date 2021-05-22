@@ -11,6 +11,7 @@
 #include <ctype.h> 
 #include <limits.h>
 #define PORT 8080  
+#define _OPEN_THREADS
 
 pthread_t tid[1000];
 
@@ -110,9 +111,21 @@ void delete_tsv(char name[], int linecount)
 
 void *client(void *arg)
 {
+    printf("Masuk fungsi client\n");
     int socketfd = *(int *)arg;
     int valread;
     char command[BUFSIZ];
+    char userpass[100];
+
+    clear_buffer(command);
+    valread = read(socketfd , command, BUFSIZ);
+    fprintf(stdout, "Receive connection handshake %s\n", command);
+
+    send(socketfd, "SUCCESS", strlen("SUCCESS"), 0);
+
+    clear_buffer(command);
+    valread = read(socketfd , command, BUFSIZ);
+    printf("ini buffer sukses lagi --> %s \n",command);
 
     while(1)
     {    
@@ -142,6 +155,7 @@ void *client(void *arg)
             int flag = 0;
             clear_buffer(buffers);
             valread = read(socketfd,buffers,BUFSIZ);
+            strcpy(userpass,buffers);
             while(fgets(temp, BUFSIZ, fdir) != NULL) 
             {
                 // printf("%s",temp);
@@ -195,12 +209,9 @@ void *client(void *arg)
             //fprintf(fdirc, "%s\n", buffers);
             fprintf(fdirc, "%s\n", data);
 
-            // FILE* flog;
-            // flog = fopen("running.log","a+");
-
-            //fprintf(fp_log, "Tambah: %s (%s)\n", filename, user_auth);
-
-            //fclose(flog);
+            FILE* log = fopen("running.log", "a") ;
+            fprintf(log, "Tambah : %s (%s)\n", filename, userpass);
+            fclose(log) ;
             
             fclose(fdirc);
 
@@ -354,6 +365,10 @@ void *client(void *arg)
                 rename(path_file, new_name);
 
                 send(socketfd,"Success", strlen("Success"),0);
+
+                FILE* dlog = fopen("running.log", "a") ;
+                fprintf(dlog, "Hapus : %s (%s)\n", namafile, userpass);
+                fclose(dlog);
             }
             else
             {
@@ -386,7 +401,6 @@ void *client(void *arg)
                 char file_exist[50];
                 char delim = '\t';
                 int idxs = 0;
-                // char fordata[BUFSIZ];
                 pisah(files, file_exist, delim, &idxs);
                 if (strstr(file_exist, filename))
                 {   
@@ -397,7 +411,7 @@ void *client(void *arg)
                     char tahun_pub[10];
                     char file_path[100];
                     char header_path[50];
-                    
+
                     flag = 1;
 
                     pisah(files, header_path, '/', &idx);
@@ -416,12 +430,12 @@ void *client(void *arg)
                     sprintf(fordata, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
 
                     strcat(buffers, fordata);
-                    // printf("Ini buffers dan fordata --> %s\n", buffers);
+                    //printf("Ini FIND =----\nIni buffers dan fordata --> %s\n", buffers);
                 }
             }
             if(flag == 1)
             {
-                send(socketfd, fordata, strlen(fordata),0 );
+                send(socketfd, buffers, strlen(buffers),0 );
             }
             else
             {
@@ -432,11 +446,16 @@ void *client(void *arg)
         }
         
         fclose(fdir);
+
+        if(valread == 0)
+        {
+            return 0;
+        }
     }
 }
 
 int main(int argc, char const *argv[]) {
-    // printf("Halo ini server");
+    printf("Halo ini server");
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
     int opt = 1;
@@ -478,9 +497,12 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
+        printf("Buat Thread Baru --\n");
         pthread_create(&(tid[total]), NULL, &client, &new_socket);
-        total++;   
-    }
+        printf("Buat Thread Join --\n");
+        pthread_join(tid[total],NULL);
+        total = total+1;   
+    }  
 
     return 0;
 }
