@@ -118,8 +118,7 @@ int main(int argc, char const *argv[]) {
                         
                         clear_buffer(buffer);
                         valread = read(new_socket, buffer,BUFSIZ);
-                        printf("ini buffer sebelum terakhir --> %s\n",buffer);
-                        
+ 
                         send(new_socket, "berhasil",strlen("berhasil"),0);
                     
                         FILE *fd;
@@ -157,12 +156,10 @@ int main(int argc, char const *argv[]) {
 
                         clear_buffer(buffer);
                         valread = read(new_socket, buffer, BUFSIZ);
-                        printf("buffer client --> %s\n", buffer);
                         
                         send(new_socket, filename, strlen(filename),0);
                         clear_buffer(buffer);
                         read(new_socket,buffer,BUFSIZ);
-                        printf("Apakah ini down success? --> %s\n",buffer);
 
                         strcpy(local,filename);
 
@@ -268,7 +265,6 @@ int main(int argc, char const *argv[]) {
             scanf("%s", password);
             strcat(username, ":");
             strcat(username, password);
-            printf("%s\n",username);
             send(new_socket , username , strlen(username) , 0 );
             clear_buffer(buffer);
             valread = read(new_socket , buffer, BUFSIZ);
