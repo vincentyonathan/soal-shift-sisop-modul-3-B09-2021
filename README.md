@@ -19,7 +19,7 @@
 ### Soal 1
 *Praktikan* diminta membantu mengerjakan suatu proyek dimana proyek tersebut meminta untuk membuat server database buku
 
-#### Soal 1.a)
+#### 1.a)
 *Praktikan* diminta untuk membuat register dan login yang sinkron antara Client dengan Server. Ketika memilih register, client akan diminta input id dan passwordnya untuk dikirimkan ke server.&nbsp; 
 User juga dapat melakukan login. Login berhasil jika id dan password yang dikirim dari aplikasi client sesuai dengan list akun yang ada didalam aplikasi server. Sistem ini juga dapat menerima multi-connections. Koneksi terhitung ketika aplikasi client tersambung dengan server. Jika terdapat 2 koneksi atau lebih maka harus menunggu sampai client pertama keluar untuk bisa melakukan login dan mengakses aplikasinya. Data berisi akun dan password tersimpan dalam **akun.txt**.
 #### Source Code
@@ -178,6 +178,7 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Karena diminta aga server dapat menghandle banyak connections. Maka dibuat thread untuk menghandle setiap koneksi. 
 - Untuk itu, Digunakan fungsi pthread_join untuk menunggu thread sampai selesai baru membuat thread baru lagi untuk membuat koneksi dengan client baru.
 
+---
 #### 1.b)
 *Praktikan* diminta untuk membuat sistem database yang bernama files.tsv. Isi dari files.tsv ini adalah path file saat berada di server, publisher, dan tahun publikasi. Setiap penambahan dan penghapusan file pada folder file yang bernama  FILES pada server akan memengaruhi isi dari files.tsv.
 
@@ -207,8 +208,9 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Untuk nomor 1 b ini, cukup membuat di server mendeklarasikan `FILE *fdirc` yang bertugas untuk membuka atau `fdirc = fopen("file.tsv","a+")`.
 - Kemudian apabila tidak ada maka akan mengeluarkan "No File".
 
+---
 
-#### Soal 1. c)
+#### 1. c)
 *Praktikan* diminta untuk membuat fitur `Add` dimana client dapat menambah file baru ke dalam server dalam FILES dengan struktur (`namafile.exstensi`). Kemudian, dari aplikasi client akan dimasukan data buku tersebut (perlu diingat bahwa Filepath ini merupakan path file yang akan dikirim ke server). Ketika file diterima di server, maka row dari files.tsv akan bertambah sesuai dengan data terbaru yang ditambahkan.
 
 #### Source Code
@@ -314,7 +316,6 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 
         }
 ```
----
 #### Explanation :
 - Pertama, user harus melakukan login terlebih dahulu untuk dapat mengakses fitur "Add" ini. Command untuk mengaktifkan command ini adalah "add".
 - Ketika user mengetik "add" maka Client akan `send` ke server dan memberitahu bahwa perintah pada server yang diminta adalah "New Data", yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
@@ -327,8 +328,8 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Kemudian akan ditambahkan ke file.tsv dengan cara `fprintf(fdirc, "%s\n", data);`.
 - Dan terakhir, Server akan `send` kode "Success" untuk membiarkan Client mengetahui bahwa menambah data baru telah berhasil atau gagal.
 
-
-#### Soal 1. d)
+---
+#### 1. d)
 *Praktikan* diminta untuk membuat fitur `Download File` dimana client dapat mendownload file yang telah ada dalam folder FILES di server dengan prosedur Server harus melihat dari files.tsv untuk melakukan pengecekan apakah file tersebut valid. Jika tidak valid, maka mengirimkan pesan error balik ke client. Jika berhasil, file akan dikirim dan akan diterima ke client di folder client tersebut.
 
 #### Source Code
@@ -434,7 +435,6 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
             } 
         }
 ```
----
 #### Explanation :
 - Untuk melakukakan download, user harus melakukan login dan memberi command untuk mengaktifkan command ini yaitu "download".
 - Ketika user mengetik "download" maka Client akan `send` ke server dan memberitahu bahwa perintah pada server yang diminta adalah "DownloadFile", yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
@@ -444,8 +444,8 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Ketika file yang dicari ada, maka Server akan mengirim ke client "Download Success", kemudian akan melakukan proses open file_path yang diinginkan read binary dengan parameter "rb" untuk melakukan send data perbaris di filepath tersebut.
 - Client akan melakukan `fopen()` untuk membuka file dengan nama yang sama seperti yang akan di download dan menerima data per line daripada file yang akan didownload dan menulisnya di file baru. Apabila gagal akan diprint "Download Failed" dan "File Not Found".
 
-
-#### Soal 1. e)
+---
+#### 1. e)
 *Praktikan* diminta untuk membuat fitur `Delete` dimana client dapat menghapus file yang tersimpan di server. Namun tidak dihapus, hanya diganti nama menjadi ‘old-NamaFile.ekstensi’. Kemudian ketika file telah diubah namanya, maka row dari file tersebut di file.tsv akan terhapus.
 
 #### Source Code
@@ -541,7 +541,6 @@ else if(strcmp(command,"Delete")==0)
             }
 
 ```
----
 #### Explanation :
 - Untuk melakukan delete, user harus mengetikkan command "delete" diikuti dengan namafile.exstensi
 - Client akan mengirimkan perintah "Delete" kepada Server yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
@@ -552,8 +551,8 @@ else if(strcmp(command,"Delete")==0)
 - Apabila gagal, maka akan dikirimkan bahwa "Failed".
 
 
-
-#### Soal 1. f)
+---
+#### 1. f)
 *Praktikan* diminta untuk membuat fitur `Delete` dimana client dapat menghapus file yang tersimpan di server. Namun tidak dihapus, hanya diganti nama menjadi ‘old-NamaFile.ekstensi’. Kemudian ketika file telah diubah namanya, maka row dari file tersebut di file.tsv akan terhapus.
 
 #### Source Code
@@ -565,11 +564,10 @@ else if(strcmp(command,"Delete")==0)
 #### Server :
 ```c
 ```
----
 #### Explanation :
 
-
-#### Soal 1. g)
+---
+#### 1. g)
 *Praktikan* diminta untuk membuat fitur `Add` dimana client dapat menambah file baru ke dalam server dalam FILES dengan struktur (`namafile.exstensi`)
 
 #### Source Code
@@ -580,10 +578,10 @@ else if(strcmp(command,"Delete")==0)
 #### Server :
 ```c
 ```
----
 #### Explanation :
 
-#### Soal 1. h)
+---
+#### 1. h)
 *Praktikan* diminta untuk membuat suatu log untuk server yang bernama **running.log** dengan format seperti pada soal.
 #### Source Code
 ---
@@ -605,7 +603,6 @@ else if(strcmp(command,"Delete")==0)
     fprintf(dlog, "Hapus : %s (%s)\n", namafile, userpass);
     fclose(dlog);
 ```
----
 #### Explanation :
 - Untuk membuat log, soal meminta log berada pada Server sehingga sebelum melakukan login, tentunya Server akan menerima data username:password dari client untuk dicek pada akun.txt
 - Kemudian data buffer itu akan disimpan dalam satu variable misalkan `userpass`
@@ -615,7 +612,7 @@ else if(strcmp(command,"Delete")==0)
 - Dan akhirnya, tidak boleh lupa bahwa file harus ditutup dengan `fclose()`.
 
 ---
-
+---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
 
