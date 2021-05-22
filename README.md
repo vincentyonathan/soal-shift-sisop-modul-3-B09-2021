@@ -180,3 +180,37 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
+
+#### Soal 3.a)
+*Praktikan* mampu membuat program sehingga dapat menerima opsi -f, sehingga pengguna dapat menambahkan argumen file yang bisa dikategorikan sebanyak yang diinginkan oleh pengguna.
+- Jika output berhasil dikategorikan maka akan mengeluarkan output : **File 1 : Berhasil Dikategorikan**
+- Jika output tidak berhasil dikategorikan maka akan mengeluarkan output : **File 2 : Sad, gagal**
+
+#### Source Code :
+```c
+...
+    if(strcmp(argv[1],"-f")==0) 
+    {
+	int i=0;
+		for(int j=2;j<argc;j++)
+		{
+		    pthread_create(&(tid[i]), NULL, pindahinajadeh, (void*) argv[j]);
+		    i++;
+		}
+		for (int j=0;j<(i);j++)
+		{
+		    long dicek;
+		    void *st;
+		    pthread_join( tid[j], &st);
+		    dicek = (long) st;
+			// printf("%ld", dicek);
+		    if(dicek == 1) 
+			printf("File %d : Berhasil Dikategorikan\n", j+1);
+		    else 
+			printf("File %d : Sad, gagal :(\n", j+1);
+		}
+        
+        return 0;
+    }
+...
+```
