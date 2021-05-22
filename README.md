@@ -621,8 +621,8 @@ else if(strcmp(command,"Delete")==0)
         }
 ```
 #### Explanation :
-- Untuk melakukan delete, user harus mengetikkan command "delete" diikuti dengan namafile.exstensi
-- Client akan mengirimkan perintah "Delete" kepada Server yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
+- Untuk melakukan See, user harus mengetikkan command "see" dan sudah login.
+- Client akan mengirimkan perintah "see" kepada Server yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
 - Kemudian Server akan membuka file.tsv dan mengiterasi satu persatu barisnya.
 - Iterasi tersebut sekaligus memanggil fungsi yang akan memisahkan data (publisher, tahun publish, dll) dan menyimpannya dalam variable.
 - Kemudian, server akan menggunakan `sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);` untuk melakukan print data yang telah di pisah dan ekstrak.
@@ -630,18 +630,123 @@ else if(strcmp(command,"Delete")==0)
 - Lalu terakhir, server akan melakukan `send` data final tersebut dan akan diterima oleh Client untuk ditampilkan.
 ---
 #### 1. g)
-*Praktikan* diminta untuk membuat fitur `Add` dimana client dapat menambah file baru ke dalam server dalam FILES dengan struktur (`namafile.exstensi`)
+*Praktikan* diminta untuk membuat fitur `Find` dimana clientdapat melakukan pencarian dengan memberikan suatu string. Hasilnya adalah semua nama file yang mengandung string tersebut.
 
 #### Source Code
 ---
 #### Client :
 ```c
+else if(strcmp(command2,"find")==0)
+	    {
+		char buffer[BUFSIZ];
+		int valread;
+		char findfile[50];
+
+		send(new_socket,"Find", strlen("Find"),0);
+
+		clear_buffer(buffer);
+		valread = read(new_socket,buffer,BUFSIZ);
+		clear_buffer(buffer);
+
+		scanf("%s",findfile);
+
+		send(new_socket,findfile,strlen(findfile),0);
+
+		clear_buffer(buffer);
+		valread = read(new_socket,buffer,BUFSIZ);
+		// printf("Buffer find --> %s\n",buffer);
+		if(strcmp(buffer,"Failed") == 0)
+		{
+		    printf("%s\n",buffer);
+		}
+		else
+		{
+		    printf("%s\n",buffer);
+		}
+	    }
 ```
 #### Server :
 ```c
+else if (strcmp(command,"Find")==0)
+        {
+            char buffers[BUFSIZ];
+            int valread;
+            char files[300];
+            char data[BUFSIZ];
+            char fordata[BUFSIZ];
+            int flag = 0;
+
+            send(socketfd,"Success",strlen("Success"),0);
+
+            clear_buffer(buffers);
+            valread = read(socketfd,buffers,BUFSIZ);
+
+            char filename[50];
+            strcpy(filename,buffers);
+
+            FILE* ffile;
+            ffile = fopen("file.tsv","r");
+
+            while (fgets(files, sizeof files, ffile)!= NULL) 
+            {
+                char file_exist[50];
+                char delim = '\t';
+                int idxs = 0;
+                pisah(files, file_exist, delim, &idxs);
+                if (strstr(file_exist, filename))
+                {   
+                    int idx = 0;
+                    char publ[50];
+                    char nama[20];
+                    char file_ext[10];
+                    char tahun_pub[10];
+                    char file_path[100];
+                    char header_path[50];
+
+                    flag = 1;
+
+                    pisah(files, header_path, '/', &idx);
+                    pisah(files, nama, '.', &idx);
+                    pisah(files, file_ext, '\t', &idx);
+
+                    // printf("Ini header_path %s\n", header_path);
+                    // printf("Ini file_ext %s\n", file_ext);
+                    // printf("Ini nama %s\n", nama);
+                    sprintf(file_path, "%s/%s.%s", header_path, nama, file_ext);
+                    
+                    pisah(files, publ, '\t', &idx);
+                    pisah(files, tahun_pub, '\n', &idx);
+                    // printf("Ini publ %s\n", publ);
+                    // printf("Ini tahun_pub %s\n", tahun_pub);
+                    sprintf(fordata, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);\
+
+                    strcat(buffers, fordata);
+                    //printf("Ini FIND =----\nIni buffers dan fordata --> %s\n", buffers);
+                }
+            }
+            if(flag == 1)
+            {
+                send(socketfd, buffers, strlen(buffers),0 );
+            }
+            else
+            {
+                send(socketfd,"Failed", strlen("Failed"),0);
+            }
+            
+            fclose(ffile);
+        }
+        
 ```
 #### Explanation :
-
+- Untuk melakukan Find, user harus mengetikkan command "find" diikuti dengan namafile.exstensi
+- Client akan mengirimkan perintah "Delete" kepada Server yang dimana telah disiapkan pada Server yaitu membaca buffer yang dikirim Client dan melakukan `strcmp`.
+- Kemudian, server akan melakukan `strcpy` filename kedalam variable untuk menyimpan filename tersebut.
+- Setelahnya, server membuka file.tsv dan mengiterasi satu-persatu baris yang ada pada file.tsv tersebut.
+- Langkah berikutnya sama seperti pada "See" yaitu memanggil fungsi yang akan memisahkan data (publisher, tahun publish, dll) dan menyimpannya dalam variable.
+- Kemudian, server akan menggunakan `sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);` untuk melakukan print data yang telah di pisah dan ekstrak.
+- Dan juga melakukan strcat untuk ide send yang hanya sekali.
+- Terakhir, pada looping diatas. Apabila file yang ingin dicari (find) ditemukan, terdapat variable flag yang berubah menjadi 1 menandakan bahwa file yang dicari ada. Paling akhir, apabila file tersebut ada maka akan dikirimkan socketfd berisi buffers yaitu data yang telah diproses.
+- Apabila file tidak ada, akan dikirim socketfd berisi buffer yang berisikan "Failed".
 ---
 #### 1. h)
 *Praktikan* diminta untuk membuat suatu log untuk server yang bernama **running.log** dengan format seperti pada soal.
@@ -672,6 +777,12 @@ else if(strcmp(command,"Delete")==0)
 - Kemudian ketika file sudah ddibuka, maka akan melakukan `fprintf` sesuai format soal yaitu Tambah untuk `add` dan Hapus untuk `delete`.
 - `fprintf(log, "Tambah : %s (%s)\n", filename, userpass);` atau `fprintf(dlog, "Hapus : %s (%s)\n", namafile, userpass);`.
 - Dan akhirnya, tidak boleh lupa bahwa file harus ditutup dengan `fclose()`.
+
+#### Kendala :
+- Read dan Send yang terkadang sulit untuk di track dan debug. 
+- Kesulitan karena seringkali terjadi deadlock atau keadaan saling menunggu.
+- Soal terlalu banyak, waktu terlalu singkat.
+- Terkadang terjadi bug pada program.
 
 ---
 ---
