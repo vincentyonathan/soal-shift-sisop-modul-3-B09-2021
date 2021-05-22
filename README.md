@@ -153,7 +153,6 @@ FILE *fdir;
 fdir = fopen("akun.txt","a+"); 
 ```
 ##### Explanation
----
 ##### Register
 - Fungsi Register pertama akan mengirim dengan `send` yang akan diterima oleh server via `read` yang berisi "register" agar server dapat mengetahui perintah apa yang sedang diminta oleh user.
 - Kemudian, server akan membaca `buffer` yang berisi register tersebut dan mengirimkan `send` kepada client bahwa perintah diterima.
@@ -202,7 +201,6 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
     ...
 ````
 ##### Explanation :
----
 - Nomor 1 b. diminta untuk membuat database bernama file.tsv yang berada di server.
 - Kemudian juga diminta untuk berisi path, publisher dan tahun publikasi.
 - Untuk nomor 1 b ini, cukup membuat di server mendeklarasikan `FILE *fdirc` yang bertugas untuk membuka atau `fdirc = fopen("file.tsv","a+")`.
