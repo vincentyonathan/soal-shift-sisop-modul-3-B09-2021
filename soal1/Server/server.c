@@ -55,7 +55,6 @@ void upload(int sockets, char namafile[])
     send(sockets,"Upload", strlen("Upload"),0);
     clear_buffer(buffer);
     read(sockets,buffer,BUFSIZ);
-    printf("ini buffer upload --> %s\n",buffer);
 
     // printf("SEND UPLOADIN\n");
     // send(sockets,"upload in", strlen("upload in"),0);
@@ -111,7 +110,6 @@ void delete_tsv(char name[], int linecount)
 
 void *client(void *arg)
 {
-    printf("Masuk fungsi client\n");
     int socketfd = *(int *)arg;
     int valread;
     char command[BUFSIZ];
@@ -125,7 +123,6 @@ void *client(void *arg)
 
     clear_buffer(command);
     valread = read(socketfd , command, BUFSIZ);
-    printf("ini buffer sukses lagi --> %s \n",command);
 
     while(1)
     {    
@@ -168,7 +165,7 @@ void *client(void *arg)
                     break;
                 }                
             }
-            // printf("bisa ga print");
+
             if(flag == 0)
             {
                 printf("Login Gagal\n");
@@ -203,7 +200,7 @@ void *client(void *arg)
 
             upload(socketfd,filename);
 
-            printf("buffer co --> %s\n",buffers);
+
             send(socketfd, "success", strlen("success"), 0);
 
             //fprintf(fdirc, "%s\n", buffers);
@@ -230,8 +227,7 @@ void *client(void *arg)
 
             clear_buffer(buffers);
             valread = read(socketfd, buffers, BUFSIZ);
-            printf("buffer server --> %s\n", buffers);
-            
+
             char file_path[100] = "FILES/";
             strcat(file_path,buffers);
 
@@ -241,7 +237,6 @@ void *client(void *arg)
             {
                 int index = 0;
                 pisah(baris, iterationb, '\t', &index);
-                printf("%s -- %s\n", iterationb, file_path);
                 if (strcmp(iterationb, file_path) == 0)
                 {
                     exist = 1;
@@ -284,7 +279,6 @@ void *client(void *arg)
             clear_buffer(datafix);
             while (fgets(files, sizeof files, fi)) 
             {
-                printf("Masuk While\n");
                 int idx = 0;
                 char publ[50];
                 char nama[20];
@@ -309,10 +303,8 @@ void *client(void *arg)
                 sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
 
                 //printf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);
-                strcat(datafix, data);   
-                printf("strcat buffer di while %s\n",data);     
-            }
-            printf("strcat buffer data %s\n",datafix);  
+                strcat(datafix, data);      
+            }  
             send(socketfd,datafix,strlen(datafix),0);
             fclose(fi);
         }
@@ -455,7 +447,6 @@ void *client(void *arg)
 }
 
 int main(int argc, char const *argv[]) {
-    printf("Halo ini server");
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
     int opt = 1;
@@ -497,9 +488,7 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        printf("Buat Thread Baru --\n");
         pthread_create(&(tid[total]), NULL, &client, &new_socket);
-        printf("Buat Thread Join --\n");
         pthread_join(tid[total],NULL);
         total = total+1;   
     }  
