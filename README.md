@@ -848,8 +848,110 @@ Pada fungsi `dapetinExt` maka program akan membaca dari nama file dari `.` sampa
 #### Penjelasan :
 Pada fungsi `checkFile` maka program akan mengecek jika didalam direktori itu adalah file reg makan akan mengembalikan nilai true, tetapi jika selain dari file reg maka akan mengembalikan nilai false. Tetapi jika filenya tidak ada maka akan mengembalikan nilai false.
 
+- **Memindahkan File**
+
+#### Source Code :
+```c
+...
+void *pindahinajadeh(void *arg)
+{
+    char basePath[PATH_MAX];
+    strcpy(basePath,(char *) arg);
+
+    if(checkFile(basePath))
+    {
+        char *i,*b;
+        char fullPath[PATH_MAX];
+        strcpy(fullPath,(char *) arg);
+
+        char namaFile[100];
+
+        for(i=strtok_r(fullPath,"/",&b); i!=NULL; i=strtok_r(NULL,"/",&b)) 
+		{
+            memset(namaFile,0,sizeof(namaFile));
+            strcpy(namaFile,i);
+        }
+
+        char extension[PATH_MAX];
+        dapetinExt(namaFile, extension);
+
+        if(strcmp(extension,"Hidden") != 0 && strcmp(extension,"Unknown") != 0)
+        {
+            for(int i = 0; i<strlen(extension); i++)
+            {
+                if(extension[i]>64 && extension[i]<91){
+					extension[i]+=32;
+				}
+            }
+        }
+        char cwd[PATH_MAX];
+        if (getcwd(cwd, sizeof(cwd)) == NULL)
+		{
+            perror("getcwd() error");
+            return (void *) 0;
+        }
+
+       
+        char destDir[PATH_MAX];
+        sprintf(destDir,"%s/%s",cwd,extension);
+        
+        bikinDirektori(destDir);
+
+        char destination[PATH_MAX];
+        sprintf(destination,"%s/%s/%s",cwd,extension,namaFile);
+       
+        rename(basePath,destination);
+        
+        return (void *) 1;
+    }
+
+    else return (void *) 0;
+}
+...
+```
+
+#### Penjelasan :
+Pada fungsi `pindahinajadeh` adalah fungsi yang berguna untuk memindahkan Filenya sesuai dengan eksistensinya, dimana dalam fungsi ini akan memanggil juga fungsi untuk `dapetinExt` untuk pengecekan. Lalu pada fungsi ini juga mengecek setiap huruf kapital akan diubah menjadi huruf kecil, dan akan memanggil fungsi pembuaan direktori untuk membuat direktori yang baru.
+
+- **Fungsi Rekursif**
+
+#### Source Code :
+```
+...
+void fungsinyagaes(char *argv){
+	int it=-1; struct dirent *direk;
+   	DIR *direktorinya = opendir(argv);
+	
+	while ((direk = readdir(direktorinya)) != NULL) {
+		char pathnya[300];
+		
+		if (strcmp(direk->d_name, ".") != 0 && strcmp(direk->d_name, "..") != 0) {
+			if(direk->d_type == DT_REG) {
+				
+				strcpy(pathnya,"");strcat(pathnya, argv);strcat(pathnya, "/");strcat(pathnya, direk->d_name);
+				pthread_create(&tid[++it], NULL, pindahinajadeh, (void *) pathnya);
+				pthread_join(tid[it], NULL);
+			}
+			else if(direk->d_type == DT_DIR) {
+				struct dirent *direk1;
+   				DIR *direktorinya1 = opendir(argv);
+				char pathnya0[300];
+				strcpy(pathnya0,"");strcat(pathnya0, argv);strcat(pathnya0, "/");strcat(pathnya0, direk->d_name);
+				fungsinyagaes(pathnya0);
+   				closedir(direktorinya1);
+			}
+		}
+	}
+	closedir(direktorinya);
+}
+...
+```
+
+#### Penjelasan :
+Pada fungsi `fungsinyagaes` merupakan sebuah fungsi untuk membuka dan membaca direktori pada setiap inputan, serta pada fungsi ini akan memanggil fungsi dari `pindahinajadeh` yang akan membuat thread baru juga. Terdapat 2 pengecekan, jika pada pengecekan tersebut adalah sebuah direktori maka akan memanggil ulang fungsi `fungsinyagaes` untuk mengakses isi dari dalam direktori tersebut berupa file-file yang ada.
+
 #### Soal 3.a)
-*Praktikan* mampu membuat program sehingga dapat menerima opsi -f, sehingga pengguna dapat menambahkan argumen file yang bisa dikategorikan sebanyak yang diinginkan oleh pengguna.
+*Praktikan* mampu membuat program sehingga dapat menerima opsi `-f`, sehingga pengguna dapat menambahkan argumen file yang bisa dikategorikan sebanyak yang diinginkan oleh pengguna.
 - Jika output berhasil dikategorikan maka akan mengeluarkan output : **File 1 : Berhasil Dikategorikan**
 - Jika output tidak berhasil dikategorikan maka akan mengeluarkan output : **File 2 : Sad, gagal**
 
@@ -882,4 +984,49 @@ Pada fungsi `checkFile` maka program akan mengecek jika didalam direktori itu ad
 ...
 ```
 
-##### Penjelasan :
+#### Penjelasan :
+Pada fungsi opsi `-f` ini akan membuat thread dari opsi yang diinginkan oleh User, dimana pada pembuatan thread akan memanggil fungsi `pindahinajadeh` dan akan dilakukan pengecekan. Jika pada fungsi ini direktori berhasil dibuat maka akan menghasilkan output yang berisikan *"Berhasil dikategorikan"* tetapi jika tidak, maka akkan menghasilkan output yang berisikan *"Sad, gagal :("*.
+
+#### Soal 3.b)
+*Praktikan* mampu membuat program sehingga dapat menerima opsi `-d`, dimana user hanya dapat menginputkan satu direktori saja. Hasil dari pengkategorian akan disimpan kedalam *Current Working Directory* dimana program tersebut dijalankan.
+- Jika program berhasil dikategorikan maka akan mengeluarkan output : **Direktori sukses disimpan!**
+- Jika program gagal dikategorikan maka akan mengeluarkan output : **Yah, gagal disimpan :(**
+
+#### Source Code :
+```c
+...
+	else if(strcmp(argv[1], "-d") == 0){
+			if( ENOENT != errno ) {
+				fungsinyagaes(argv[2]);
+				printf("Direktori sukses disimpan!\n");
+			}
+			else {
+				printf("Yah, gagal disimpan :(\n");
+			}
+	}
+...
+```
+
+#### Penjelasan :
+Pada fungsi opsi `-d`, jika berhasil dikategorikan akan memanggil *function* `fungsinyagaes` dimana pada fungsi tersebut akan mengecek setiap isi dari direktori yang akan di akses dan akan memindahkan direktori yang telag dikategorikan ke dalam cwd. Sehungga jika pada program berhasil membuat direktorinya dan memindahkan pengkategorian direktori kedalam cwd maka akan mengeluarkan output *"Direktori sukses disimpan!"*. Tetapi jika program tidak berhasil dalam membuat direktori dan memindahkan pengkategorian direktori kedalam cwd maka akan mengeluarkan output *"Yah, gagal disimpan :("*.
+
+#### Soal 3.c)
+*Praktikan* mampu membuat program sehingga dapat menerima opsi `*`, dimana program akan mengkategorikan seluruh file yang ada di *Current Working Directory* ketika menjalankan program tersebut.
+
+#### Source Code :
+```c
+...
+	else if (strcmp(argv[1], "*") == 0) {
+		char cwd[300];
+		getcwd(cwd, sizeof(cwd));
+		fungsinyagaes(cwd);
+	}
+...
+```
+
+#### Penjelasan :
+Pada fungsi opsi `*` akan mengalokasikan memori untuk variabel dari cwd, dimana setelah itu akan memanggil fungsi `fungsinyagaes` yang akan mengkategorikan semua file yang di **cwd** sesuai dengan eksistensinya.
+
+#### Kendala :
+- Bingung ketika pada program `-d` pengkategorian tidak pindah ke cwd
+- Bingung ketika terdapat lebih dari satu eksistensi, tetapi hanya satu saja yang dapat dikategorikan
