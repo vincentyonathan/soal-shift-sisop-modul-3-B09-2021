@@ -176,3 +176,7 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 
 #### 1.b)
 *Praktikan* diminta untuk membuat fitur add data
+
+---
+### Soal 3
+*Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
