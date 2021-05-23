@@ -810,7 +810,6 @@ else if (strcmp(command,"Find")==0)
 - Terkadang terjadi bug pada program.
 
 ---
----
 ### Soal 2
 *Praktikan* diminta untuk diminta untuk membuat program yang dapat menghitung matrix 4x3 dengan 3x6, lalu menghitung hasil perkalian nya dengan faktorial menggunakan matrix baru sebagai pembatas faktorial. Setelah program selesai, *Praktikan* juga diminta untuk mengecek 5 proses teratas untuk mengecek resource yang digunakan.
 
@@ -870,7 +869,190 @@ void main() {
 
 #### Output
 ![2a](./screenshot/2a.PNG)
----
+#### 2.b)
+*Praktikan* diminta untuk melakukan faktorial dengan batas sesuai dengan matrix baru
+
+#### Source Code :
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <stdbool.h>
+
+int mx2[4][6], selisih;
+bool isnull = false;
+
+void input(){
+	printf("Input matriks 4x6\n");
+	for (int i = 0; i < 4; i++) {
+    	for (int j = 0; j < 6; j++) {
+      		scanf("%d", &mx2[i][j]);
+   	 	}
+  	}
+}
+long long factorial(int n) {
+    if (n == 0) return 1;
+    else return n * factorial(n - 1);
+}
+long long except(int n){
+	if (n == selisih) return 1;
+        else return n * except(n - 1);
+}
+
+void *kondisi(void* arg){
+	long long angka = *(long long*)arg;
+	if(isnull)//=0
+		printf("0 ");
+	else if(selisih<1) /// <1
+    	printf("%lld ", factorial(angka));
+	else//>1
+		printf("%lld ", except(angka));
+}
+
+int main(){
+	int angka;
+	key_t key = 1234;
+    int (*value)[6];
+    int shmid = shmget(key, sizeof(int[4][6]), IPC_CREAT | 0666);
+    value = shmat(shmid, NULL, 0);
+    
+    input();
+    
+    pthread_t tid[4*6];
+    int index=0;
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 6; j++){
+        	isnull=false;
+            long long *val = malloc(sizeof(long long[4][6]));
+            *val = value[i][j];
+            selisih = value[i][j] - mx2[i][j];
+            if(value[i][j]==0 || mx2[i][j]==0) isnull=true;
+            pthread_create(&tid[index], NULL, &kondisi, val);
+            sleep(1);
+            index++;
+        }
+        printf("\n");
+    }
+    for (int i = 0; i < index; i++) {
+        pthread_join(tid[i], NULL);
+    }
+    shmdt(value);
+    shmctl(shmid, IPC_RMID, NULL);
+
+	return 0;
+}
+```
+#### Penjelasan :
+- Program meminta untuk melakukan input matriks 4x6 agar bersesuaian dengan matriks yang ada di program sebelumnya
+- Program melakukan faktorial dengan mengecek melalui fungsi `kondisi`, untuk menyesuaikan permintaan yang ada di soal
+- Setelah program melakukan faktorial, program mengprint hasil nya.
+
+#### Output :
+![2b](./screenshot/2b.PNG)
+
+#### 2.c)
+*Praktikan* diminta untuk menunjukkan 5 proses teratas yang memakan resource
+
+#### Source Code :
+```c
+#include<stdio.h> 
+#include<stdlib.h> 
+#include<unistd.h> 
+#include<sys/types.h> 
+#include<string.h> 
+#include<sys/wait.h> 
+
+int pid;
+int pipe1[2];
+int pipe2[2];
+void exec1() {
+    dup2(pipe1[1], 1);
+
+    close(pipe1[0]);
+    close(pipe1[1]);
+    
+    execlp("ps", "ps", "aux", NULL);
+    
+    perror("exec ps failed");
+    _exit(1);
+}
+void exec2() {
+    dup2(pipe1[0], 0);
+    
+    dup2(pipe2[1], 1);
+    
+    close(pipe1[0]);
+    close(pipe1[1]);
+    close(pipe2[0]);
+    close(pipe2[1]);
+    
+    execlp("sort", "sort", "-nrk", "3,3", NULL);
+    
+    perror("exec sort failed");
+    _exit(1);
+}
+void exec3() {
+    dup2(pipe2[0], 0);
+    
+    close(pipe2[0]);
+    close(pipe2[1]);
+    
+    execlp("head", "head", "-5", NULL);
+    
+    perror("exec head failed");
+    _exit(1);
+}
+
+void main() {
+    if (pipe(pipe1) == -1) {
+        perror("Pipe1 Failed");
+        exit(1);
+    }
+    if ((pid = fork()) == -1) {
+        perror("Fork1 Failed");
+        exit(1);
+    }
+    else if (pid == 0) {
+        exec1();
+    }
+
+    if (pipe(pipe2) == -1) {
+        perror("Pipe2 Failed");
+        exit(1);
+    }
+    if ((pid = fork()) == -1) {
+        perror("Fork2 Failed");
+        exit(1);
+    }
+    else if (pid == 0) {
+        exec2();
+    }
+
+    close(pipe1[0]);
+    close(pipe1[1]);
+
+    if ((pid = fork()) == -1) {
+        perror("Fork3 Failed");
+        exit(1);
+    }
+    else if (pid == 0) {
+        exec3();
+    }
+
+
+}
+```
+
+#### Penjelasan :
+- Didalam program terdapat fungsi yang diminta sesuai dengan soal seperti `ps aux`, `sort nrk`, dan `head`
+- Fungsi yang diminta akan dijalankan apabila syarat terpenuhi
+- Program mengprint ke 5 proses yang memakan resource, sesuai dengan yang diminta soal
+
+#### Output :
+![2c](./screenshot/2c.PNG)
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
