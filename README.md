@@ -1053,6 +1053,10 @@ void main() {
 
 #### Output :
 ![2c](./screenshot/2c.PNG)
+
+#### Kendala :
+- Dikarenakan belum sempat membuat fungsi faktorial, sebelum revisi hanya selesai 2a
+- Karena source code lama tidak kompatibel dengan 2b, 2a sempat dibuat ulang
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
