@@ -810,6 +810,7 @@ else if (strcmp(command,"Find")==0)
 - Terkadang terjadi bug pada program.
 
 ---
+---
 ### Soal 2
 *Praktikan* diminta untuk diminta untuk membuat program yang dapat menghitung matrix 4x3 dengan 3x6, lalu menghitung hasil perkalian nya dengan faktorial menggunakan matrix baru sebagai pembatas faktorial. Setelah program selesai, *Praktikan* juga diminta untuk mengecek 5 proses teratas untuk mengecek resource yang digunakan.
 
@@ -869,6 +870,7 @@ void main() {
 
 #### Output
 ![2a](./screenshot/2a.PNG)
+---
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
