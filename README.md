@@ -1259,6 +1259,14 @@ Pada fungsi `fungsinyagaes` merupakan sebuah fungsi untuk membuka dan membaca di
 #### Penjelasan :
 Pada fungsi opsi `-f` ini akan membuat thread dari opsi yang diinginkan oleh User, dimana pada pembuatan thread akan memanggil fungsi `pindahinajadeh` dan akan dilakukan pengecekan. Jika pada fungsi ini direktori berhasil dibuat maka akan menghasilkan output yang berisikan *"Berhasil dikategorikan"* tetapi jika tidak, maka akkan menghasilkan output yang berisikan *"Sad, gagal :("*.
 
+#### Output :
+![31](./screenshot/31.png)
+![32](./screenshot/32.png)
+
+- Hidden File :
+![33](./screenshot/33.png)
+![34](./screenshot/34.png)
+
 #### Soal 3.b)
 *Praktikan* mampu membuat program sehingga dapat menerima opsi `-d`, dimana user hanya dapat menginputkan satu direktori saja. Hasil dari pengkategorian akan disimpan kedalam *Current Working Directory* dimana program tersebut dijalankan.
 - Jika program berhasil dikategorikan maka akan mengeluarkan output : **Direktori sukses disimpan!**
@@ -1282,6 +1290,10 @@ Pada fungsi opsi `-f` ini akan membuat thread dari opsi yang diinginkan oleh Use
 #### Penjelasan :
 Pada fungsi opsi `-d`, jika berhasil dikategorikan akan memanggil *function* `fungsinyagaes` dimana pada fungsi tersebut akan mengecek setiap isi dari direktori yang akan di akses dan akan memindahkan direktori yang telag dikategorikan ke dalam cwd. Sehungga jika pada program berhasil membuat direktorinya dan memindahkan pengkategorian direktori kedalam cwd maka akan mengeluarkan output *"Direktori sukses disimpan!"*. Tetapi jika program tidak berhasil dalam membuat direktori dan memindahkan pengkategorian direktori kedalam cwd maka akan mengeluarkan output *"Yah, gagal disimpan :("*.
 
+#### Output :
+![35](./screenshot/35.png)
+![36](./screenshot/36.png)
+
 #### Soal 3.c)
 *Praktikan* mampu membuat program sehingga dapat menerima opsi `*`, dimana program akan mengkategorikan seluruh file yang ada di *Current Working Directory* ketika menjalankan program tersebut.
 
@@ -1298,6 +1310,9 @@ Pada fungsi opsi `-d`, jika berhasil dikategorikan akan memanggil *function* `fu
 
 #### Penjelasan :
 Pada fungsi opsi `*` akan mengalokasikan memori untuk variabel dari cwd, dimana setelah itu akan memanggil fungsi `fungsinyagaes` yang akan mengkategorikan semua file yang di **cwd** sesuai dengan eksistensinya.
+
+#### Output :
+![37](./screenshot/37.png)
 
 #### Kendala :
 - Bingung ketika pada program `-d` pengkategorian tidak pindah ke cwd
