@@ -177,6 +177,9 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Karena diminta aga server dapat menghandle banyak connections. Maka dibuat thread untuk menghandle setiap koneksi. 
 - Untuk itu, Digunakan fungsi pthread_join untuk menunggu thread sampai selesai baru membuat thread baru lagi untuk membuat koneksi dengan client baru.
 
+#### Output :
+![1a](./screenshot/Register.JPG)
+
 ---
 #### 1.b)
 *Praktikan* diminta untuk membuat sistem database yang bernama files.tsv. Isi dari files.tsv ini adalah path file saat berada di server, publisher, dan tahun publikasi. Setiap penambahan dan penghapusan file pada folder file yang bernama  FILES pada server akan memengaruhi isi dari files.tsv.
@@ -327,6 +330,10 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Dan terakhir, Server akan `send` kode "Success" untuk membiarkan Client mengetahui bahwa menambah data baru telah berhasil atau gagal.
 
 ---
+#### Output :
+![1c](./screenshot/Add.JPG)
+
+---
 #### 1. d)
 *Praktikan* diminta untuk membuat fitur `Download File` dimana client dapat mendownload file yang telah ada dalam folder FILES di server dengan prosedur Server harus melihat dari files.tsv untuk melakukan pengecekan apakah file tersebut valid. Jika tidak valid, maka mengirimkan pesan error balik ke client. Jika berhasil, file akan dikirim dan akan diterima ke client di folder client tersebut.
 
@@ -443,6 +450,10 @@ Dimana berarti user hanya akan dapat melakukan kegiatan ini ketika sudah berhasi
 - Client akan melakukan `fopen()` untuk membuka file dengan nama yang sama seperti yang akan di download dan menerima data per line daripada file yang akan didownload dan menulisnya di file baru. Apabila gagal akan diprint "Download Failed" dan "File Not Found".
 
 ---
+#### Output :
+![1d](./screenshot/Download1.JPG)
+![1d](./screenshot/Download2.JPG)
+---
 #### 1. e)
 *Praktikan* diminta untuk membuat fitur `Delete` dimana client dapat menghapus file yang tersimpan di server. Namun tidak dihapus, hanya diganti nama menjadi ‘old-NamaFile.ekstensi’. Kemudian ketika file telah diubah namanya, maka row dari file tersebut di file.tsv akan terhapus.
 
@@ -547,7 +558,9 @@ else if(strcmp(command,"Delete")==0)
 - Setelah itu, akan dipanggil fungsi delete_tsv dimana dideklarasikan 2 tsv yaitu lama dan baru, yang lama menyimpan seluruh file yang di "add" oleh user, setelah itu akan dicopy smeua line kecuali line yang dimana file yang akan didelete itu ditemukan pada looping tadi
 - Terakhir, nama file akan diganti dari yang tadinya "Namafile.extensi" menjadi "old-Namafile.extensi".
 - Apabila gagal, maka akan dikirimkan bahwa "Failed".
-
+---
+#### Output :
+![1e](./screenshot/Delete.JPG)
 
 ---
 #### 1. f)
@@ -628,6 +641,10 @@ else if(strcmp(command,"Delete")==0)
 - Kemudian, server akan menggunakan `sprintf(data, "Nama: %s\nPublisher: %s\nTahun publishing: %s\nEkstensi file: %s\nFilepath: %s\n\n", nama, publ, tahun_pub, file_ext, file_path);` untuk melakukan print data yang telah di pisah dan ekstrak.
 - Karena ide saya adalah hanya `send` 1x, maka Server melakukan `strcat` untuk data yang akan dikirm sehingga nantinya data yang akan dikirim berisi semua data yang telah difilter.
 - Lalu terakhir, server akan melakukan `send` data final tersebut dan akan diterima oleh Client untuk ditampilkan.
+---
+#### Output :
+![1f](./screenshot/See.JPG)
+
 ---
 #### 1. g)
 *Praktikan* diminta untuk membuat fitur `Find` dimana clientdapat melakukan pencarian dengan memberikan suatu string. Hasilnya adalah semua nama file yang mengandung string tersebut.
@@ -748,6 +765,10 @@ else if (strcmp(command,"Find")==0)
 - Terakhir, pada looping diatas. Apabila file yang ingin dicari (find) ditemukan, terdapat variable flag yang berubah menjadi 1 menandakan bahwa file yang dicari ada. Paling akhir, apabila file tersebut ada maka akan dikirimkan socketfd berisi buffers yaitu data yang telah diproses.
 - Apabila file tidak ada, akan dikirim socketfd berisi buffer yang berisikan "Failed".
 ---
+#### Output :
+![1g](./screenshot/Find1.JPG)
+![1g](./screenshot/Find2.JPG)
+---
 #### 1. h)
 *Praktikan* diminta untuk membuat suatu log untuk server yang bernama **running.log** dengan format seperti pada soal.
 #### Source Code
@@ -778,11 +799,19 @@ else if (strcmp(command,"Find")==0)
 - `fprintf(log, "Tambah : %s (%s)\n", filename, userpass);` atau `fprintf(dlog, "Hapus : %s (%s)\n", namafile, userpass);`.
 - Dan akhirnya, tidak boleh lupa bahwa file harus ditutup dengan `fclose()`.
 
+#### Output
+![1h](./screenshot/Log.JPG)
+
+---
 #### Kendala :
 - Read dan Send yang terkadang sulit untuk di track dan debug. 
 - Kesulitan karena seringkali terjadi deadlock atau keadaan saling menunggu.
 - Soal terlalu banyak, waktu terlalu singkat.
 - Terkadang terjadi bug pada program.
+
+---
+#### Output :
+![1a](./screenshot/1a.PNG)
 
 ---
 ---
