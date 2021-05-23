@@ -810,6 +810,65 @@ else if (strcmp(command,"Find")==0)
 - Terkadang terjadi bug pada program.
 
 ---
+### Soal 2
+*Praktikan* diminta untuk diminta untuk membuat program yang dapat menghitung matrix 4x3 dengan 3x6, lalu menghitung hasil perkalian nya dengan faktorial menggunakan matrix baru sebagai pembatas faktorial. Setelah program selesai, *Praktikan* juga diminta untuk mengecek 5 proses teratas untuk mengecek resource yang digunakan.
+
+#### 2.a)
+*Praktikan* diminta untuk membuat program yang mampu melakukan perkalian matrix 4x3 dan 3x6.
+
+#### Source Code :
+```c
+#include <stdio.h>
+#include <pthread.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+int mx1[4][3], mx2[3][6];
+void matriksAwal(){
+	printf("Input matriks 4x3\n");
+	for (int i = 0; i < 4; i++) {
+    	for (int j = 0; j < 3; j++) {
+      		scanf("%d", &mx1[i][j]);
+   	 	}
+  	}
+  	printf("Input matriks 3x6\n");
+	for (int i = 0; i < 3; i++) {
+    	for (int j = 0; j < 6; j++) {
+      		scanf("%d", &mx2[i][j]);
+   	 	}
+  	}
+}
+
+void main() {
+	matriksAwal();
+	
+	key_t key = 1234;
+  	int (*value)[6];
+  	int shmid = shmget(key, sizeof(int[4][6]), IPC_CREAT | 0666);
+  	value = shmat(shmid, NULL, 0);
+  	
+  	printf("Hasil Perkalian Matriks :\n");
+  	for (int i = 0; i < 4; i++) {
+    	for (int j = 0; j < 6; j++) {
+    		for (int k = 0; k< 3; k++){
+      			value[i][j] += mx1[i][k] * mx2[k][j];
+			}
+      		printf("%d ",value[i][j]);
+   	 	}
+    	printf("\n");
+  	}
+  	shmdt(value);
+}
+```
+#### Penjelasan :
+- Fungsi `matriks awal` digunakan untuk menginput matriks sesuai dengan permintaan
+- `matriks awal` dijalankan pada `main` lalu di print sesuai hasil yang baru
+
+#### Output
+![2a](./screenshot/2a.PNG)
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
