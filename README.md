@@ -810,10 +810,6 @@ else if (strcmp(command,"Find")==0)
 - Terkadang terjadi bug pada program.
 
 ---
-#### Output :
-![1a](./screenshot/1a.PNG)
-
----
 ---
 ### Soal 3
 *Praktikan* mampu membuat sebuah program c untuk mengkategorikan file-file yang jumlahnya banyak. Dimana program ini akan memindahkan file sesuai dengan eksistensinya dan hasilnya akan disimpan kedalam *Working Directory* ketika program tersebut dijalankan.
